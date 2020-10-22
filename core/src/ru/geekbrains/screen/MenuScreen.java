@@ -23,7 +23,7 @@ public class MenuScreen extends BaseScreen {
     public void show() {
         super.show();
         img = new Texture("badlogic.jpg");
-        pos = new Vector2();
+        pos = new Vector2(-0.5f, -0.5f);
         destPos = new Vector2();
         v = new Vector2();
         tempPos = new Vector2();
@@ -35,7 +35,7 @@ public class MenuScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         batch.begin();
-        batch.draw(img, pos.x, pos.y);
+        batch.draw(img, pos.x, pos.y, 0.5f, 0.5f);
         batch.end();
 
 //      1-ый способ. мой
@@ -57,15 +57,15 @@ public class MenuScreen extends BaseScreen {
             }
     }
 
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        destPos.set(screenX, Gdx.graphics.getHeight() - screenY);
-        v = destPos.cpy().sub(pos);
-//        distance = v.len();      //  1-ый способ.
-        v.setLength(V_LEN);        //  скорость не меняется.
-//        v.scl(0.01f);           //  скорость меняется.
-        return super.touchDown(screenX, screenY, pointer, button);
-    }
+//    @Override
+//    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+//        destPos.set(screenX, Gdx.graphics.getHeight() - screenY);
+//        v = destPos.cpy().sub(pos);
+////        distance = v.len();      //  1-ый способ.
+//        v.setLength(V_LEN);        //  скорость не меняется.
+////        v.scl(0.01f);           //  скорость меняется.
+//        return super.touchDown(screenX, screenY, pointer, button);
+//    }
 
     @Override
     public boolean keyDown(int keycode) {
