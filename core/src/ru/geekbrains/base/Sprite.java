@@ -45,6 +45,10 @@ public class Sprite extends Rect {
         );
     }
 
+    public void update(float delta) {
+
+    }
+
     public void resize(Rect worldBounds) {
 
     }
@@ -54,6 +58,11 @@ public class Sprite extends Rect {
     }
 
     public boolean touchUp(Vector2 touch, int pointer, int button) {
+        return false;
+    }
+
+    public boolean keyDown(int keycode)
+    {
         return false;
     }
 
