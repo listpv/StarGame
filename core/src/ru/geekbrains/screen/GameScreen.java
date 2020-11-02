@@ -1,5 +1,7 @@
 package ru.geekbrains.screen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -9,9 +11,13 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.EnemyShipPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.EnemyShip;
 import ru.geekbrains.sprite.MainShip;
 import ru.geekbrains.sprite.Star;
+import ru.geekbrains.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
 
@@ -19,11 +25,15 @@ public class GameScreen extends BaseScreen {
 
     private TextureAtlas atlas;
     private Texture bg;
+    private Music music;
+    private Sound enemyBulletSound;
 
     private Background background;
     private Star[] stars;
     private BulletPool bulletPool;
+    private EnemyShipPool enemyShipPool;
     private MainShip mainShip;
+    private EnemyEmitter enemyEmitter;
 
 //    private Texture logo;
 //    private TextureRegion logoRegion;
@@ -33,6 +43,8 @@ public class GameScreen extends BaseScreen {
         super.show();
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
         bg = new Texture("textures/bg.png");
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.mp3"));
+        enemyBulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
 
         background = new Background(bg);
         stars = new Star[STAR_COUNT];
@@ -41,8 +53,12 @@ public class GameScreen extends BaseScreen {
         }
 
         bulletPool = new BulletPool();
-//        mainShip = new MainShip(atlas, bulletPool);
-        mainShip = new MainShip(atlas, bulletPool, sound);
+        enemyShipPool = new EnemyShipPool(bulletPool, worldBounds);
+        mainShip = new MainShip(atlas, bulletPool);
+        enemyEmitter = new EnemyEmitter(worldBounds, enemyShipPool, enemyBulletSound, atlas);
+//        mainShip = new MainShip(atlas, bulletPool, sound);
+
+        music.setLooping(true);
         music.play();
 //        logo = new Texture("badlogic.jpg");
 //        logoRegion = new TextureRegion(logo, 0, 0, logo.getWidth() / 2 , logo.getHeight());
@@ -72,6 +88,10 @@ public class GameScreen extends BaseScreen {
         bg.dispose();
         atlas.dispose();
         bulletPool.dispose();
+        enemyShipPool.dispose();
+        music.dispose();
+        enemyBulletSound.dispose();
+        mainShip.dispose();
 //        logo.dispose();
         super.dispose();
     }
@@ -105,14 +125,28 @@ public class GameScreen extends BaseScreen {
             star.update(delta);
         }
         bulletPool.updateActiveSprites(delta);
+        enemyShipPool.updateActiveSprites(delta);
         mainShip.update(delta);
+        enemyEmitter.generate(delta);
     }
 
     private void checkCollision() {
+//        for(EnemyShip o : enemyShipPool.getActiveObjects()){
+////            for(Bullet b : mainShip.getBulletPool().getActiveObjects()){
+//                Bullet b = mainShip.getBulletPool().getActiveObjects().get(mainShip.getBulletPool().getActiveObjects().size() -1);
+//                if(o.isMe(b.pos)){
+//                    System.out.println("ship  " + o.getBottom() + "  " + o.getTop() + "  " + o.getLeft() +  "  " + o.getRight());
+//                    System.out.println("bull  " + b.pos.x + "  " + b.pos.y);
+//                    b.destroy();
+//                    o.destroy();
+//                }
+//            }
     }
 
     private void freeAllDestroyed() {
+
         bulletPool.freeAllDestroyedActiveSprites();
+        enemyShipPool.freeAllDestroyedActiveSprites();
     }
 
     private void draw() {
@@ -122,6 +156,7 @@ public class GameScreen extends BaseScreen {
             star.draw(batch);
         }
         bulletPool.drawActiveSprites(batch);
+        enemyShipPool.drawActiveSprites(batch);
         mainShip.draw(batch);
 //        batch.draw(logoRegion, 0, 0, 0.2f, 0.2f);
         batch.end();

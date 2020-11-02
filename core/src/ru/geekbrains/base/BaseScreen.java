@@ -14,20 +14,17 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.math.MatrixUtils;
 import ru.geekbrains.math.Rect;
 
-public class BaseScreen implements Screen, InputProcessor {
+public abstract class BaseScreen implements Screen, InputProcessor {
 
     protected SpriteBatch batch;
     private Rect screenBounds;
-    private Rect worldBounds;
+    protected Rect worldBounds;
     private Rect glBounds;
 
     private Matrix4 worldToGl;
     private Matrix3 screenToWorld;
 
     private Vector2 touch;
-
-    protected Music music;
-    protected Sound sound;
 
     @Override
     public void show() {
@@ -41,8 +38,6 @@ public class BaseScreen implements Screen, InputProcessor {
         screenToWorld = new Matrix3();
         touch = new Vector2();
         Gdx.input.setInputProcessor(this);
-        music = Gdx.audio.newMusic(Gdx.files.internal("sounds\\music.mp3"));
-        sound = Gdx.audio.newSound(Gdx.files.internal("sounds\\laser.wav"));
     }
 
     @Override
@@ -90,8 +85,6 @@ public class BaseScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         System.out.println("dispose");
-        music.dispose();
-        sound.dispose();
         batch.dispose();
     }
 
