@@ -131,16 +131,17 @@ public class GameScreen extends BaseScreen {
     }
 
     private void checkCollision() {
-//        for(EnemyShip o : enemyShipPool.getActiveObjects()){
-////            for(Bullet b : mainShip.getBulletPool().getActiveObjects()){
+        for(EnemyShip o : enemyShipPool.getActiveObjects()){
+//            for(Bullet b : mainShip.getBulletPool().getActiveObjects()){
 //                Bullet b = mainShip.getBulletPool().getActiveObjects().get(mainShip.getBulletPool().getActiveObjects().size() -1);
-//                if(o.isMe(b.pos)){
-//                    System.out.println("ship  " + o.getBottom() + "  " + o.getTop() + "  " + o.getLeft() +  "  " + o.getRight());
-//                    System.out.println("bull  " + b.pos.x + "  " + b.pos.y);
-//                    b.destroy();
-//                    o.destroy();
-//                }
-//            }
+            Bullet b = mainShip.getBulletPool().getActiveObjects().get(1);
+                if(o.isMe(b.pos)){
+                    System.out.println("ship  " + o.getBottom() + "  " + o.getTop() + "  " + o.getLeft() +  "  " + o.getRight());
+                    System.out.println("bull  " + b.pos.x + "  " + b.pos.y);
+                    b.destroy();
+                    o.destroy();
+                }
+            }
     }
 
     private void freeAllDestroyed() {
