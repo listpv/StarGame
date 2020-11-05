@@ -13,13 +13,14 @@ import ru.geekbrains.base.Ship;
 import ru.geekbrains.base.Sprite;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.ExplosionPool;
 
 public class MainShip extends Ship {
 
     public static final float SHIP_HEIGHT = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final float RELOAD_INTERVAL = 0.2f;
-    private static final int HP = 100;
+    private static final int HP = 5;
 
     private static final int INVALID_POINTER = -1;
 
@@ -44,9 +45,10 @@ public class MainShip extends Ship {
 
 //    private float reloadTimer;
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.bulletRegion = atlas.findRegion("bulletMainShip");
         this.bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         this.bulletHeight = 0.01f;
@@ -100,6 +102,16 @@ public class MainShip extends Ship {
     public void dispose() {
         bulletSound.dispose();
     }
+
+    public boolean isBulletCollision(Rect bullet) {
+        return !(
+                bullet.getRight() < getLeft()
+                        || bullet.getLeft() > getRight()
+                        || bullet.getBottom() > pos.y
+                        || bullet.getTop() < getBottom()
+        );
+    }
+
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {

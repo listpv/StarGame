@@ -6,12 +6,18 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
+import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.Explosion;
+import ru.geekbrains.sprite.MainShip;
 
 public abstract class Ship extends Sprite{
 
+    private static final float DAMAGE_ANIMATE_INTERVAL = 0.1f;
+
     protected Rect worldBounds;
     protected BulletPool bulletPool;
+    protected ExplosionPool explosionPool;
     protected TextureRegion bulletRegion;
     protected Sound bulletSound;
     protected float bulletHeight;
@@ -26,6 +32,8 @@ public abstract class Ship extends Sprite{
     protected float reloadInterval;
 
     protected int hp;
+
+    private float damageAnimateTimer = DAMAGE_ANIMATE_INTERVAL;
 
     public Ship() {
         v = new Vector2();
@@ -47,11 +55,39 @@ public abstract class Ship extends Sprite{
         super.update(delta);
         pos.mulAdd(v, delta);
         reloadTimer += delta;
-        if (reloadTimer >= reloadInterval && getTop() <= worldBounds.getTop())    //  стрельба.
+        if (reloadTimer >= reloadInterval)
         {
             reloadTimer = 0;
             shoot();
         }
+        damageAnimateTimer += delta;
+        if (damageAnimateTimer >= DAMAGE_ANIMATE_INTERVAL) {
+            frame = 0;
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        boom();
+    }
+
+    public void damage(int damage) {
+        frame = 1;
+        damageAnimateTimer = 0f;
+        hp -= damage;
+        if (hp <= 0) {
+            hp = 0;
+//            if (this instanceof MainShip)
+//            {
+//
+//            }
+            destroy();
+        }
+    }
+
+    public int getDamage() {
+        return damage;
     }
 
     private void shoot() {
@@ -62,5 +98,14 @@ public abstract class Ship extends Sprite{
 
     public BulletPool getBulletPool() {
         return bulletPool;
+    }
+
+    private void boom() {
+        Explosion explosion = explosionPool.obtain();
+        explosion.set(getHeight(), pos);
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 }
