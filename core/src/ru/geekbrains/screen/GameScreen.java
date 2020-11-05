@@ -30,7 +30,7 @@ public class GameScreen extends BaseScreen {
     private static final int STAR_COUNT = 64;
 
     private float tempOver;   //  переменная для взрыва MainShip перед GameOver
-    public boolean newGame;   //  переменная для новой игры.
+    public boolean newGame;
 
     private TextureAtlas atlas;
     private Texture bg;
