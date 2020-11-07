@@ -10,24 +10,21 @@ import ru.geekbrains.screen.GameScreen;
 
 public class NewGameButton extends BaseButton {
 
-    public GameScreen gameScreen;
+    private static final float HEIGHT = 0.05f;
+    private static final float TOP_MARGIN = -0.012f;
+
+    private GameScreen gameScreen;
 
     public NewGameButton(TextureAtlas atlas, GameScreen gameScreen) {
         super(atlas.findRegion("button_new_game"));
+        setHeightProportion(HEIGHT);
+        setTop(TOP_MARGIN);
         this.gameScreen = gameScreen;
     }
 
     @Override
-    public void resize(Rect worldBounds) {
-        setHeightProportion(0.2f);
-        setWidth(0.5f);
-        setBottom(worldBounds.getBottom() + 0.025f);
-    }
-
-
-
-    @Override
     public void action() {
-        gameScreen.newGame = true;
+        gameScreen.startNewGame();
     }
+
 }

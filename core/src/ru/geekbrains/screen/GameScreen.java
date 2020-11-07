@@ -29,8 +29,8 @@ public class GameScreen extends BaseScreen {
 
     private static final int STAR_COUNT = 64;
 
-    private float tempOver;   //  переменная для взрыва MainShip перед GameOver
-    public boolean newGame;   //  переменная для новой игры.
+    private enum State { PLAYING, GAME_OVER }
+
 
     private TextureAtlas atlas;
     private Texture bg;
@@ -48,9 +48,10 @@ public class GameScreen extends BaseScreen {
     private GameOver gameOver;
     private NewGameButton newGameButton;
 
+    private State state;
+
 //    private Texture logo;
 //    private TextureRegion logoRegion;
-
 
 
     @Override
@@ -73,16 +74,24 @@ public class GameScreen extends BaseScreen {
         enemyShipPool = new EnemyShipPool(bulletPool, explosionPool, worldBounds);
         mainShip = new MainShip(atlas, bulletPool, explosionPool);
         enemyEmitter = new EnemyEmitter(worldBounds, enemyShipPool, enemyBulletSound, atlas);
+
         gameOver = new GameOver(atlas);
         newGameButton = new NewGameButton(atlas, this);
 
-        tempOver = 0f;
-        newGame = false;
-
         music.setLooping(true);
         music.play();
+
+        state = State.PLAYING;
 //        logo = new Texture("badlogic.jpg");
 //        logoRegion = new TextureRegion(logo, 0, 0, logo.getWidth() / 2 , logo.getHeight());
+    }
+
+    public void startNewGame() {
+        state = State.PLAYING;
+        mainShip.startNewGame(worldBounds);
+        bulletPool.freeAllActiveObjects();
+        enemyShipPool.freeAllActiveObjects();
+        explosionPool.freeAllActiveObjects();
     }
 
     @Override
@@ -102,8 +111,6 @@ public class GameScreen extends BaseScreen {
             star.resize(worldBounds);
         }
         mainShip.resize(worldBounds);
-        gameOver.resize(worldBounds);
-        newGameButton.resize(worldBounds);
     }
 
     @Override
@@ -123,32 +130,38 @@ public class GameScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
-        mainShip.keyDown(keycode);
+        if (state == State.PLAYING) {
+            mainShip.keyDown(keycode);
+        }
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        mainShip.keyUp(keycode);
+        if (state == State.PLAYING) {
+            mainShip.keyUp(keycode);
+        }
         return false;
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        mainShip.touchDown(touch, pointer, button);
-        newGameButton.touchDown(touch, pointer, button);
+        if (state == State.PLAYING) {
+            mainShip.touchDown(touch, pointer, button);
+        }
+        else if (state == State.GAME_OVER) {
+            newGameButton.touchDown(touch, pointer, button);
+        }
         return false;
-    }
+        }
 
     @Override
     public boolean touchUp(Vector2 touch, int pointer, int button) {
-        mainShip.touchUp(touch, pointer, button);
-        newGameButton.touchUp(touch, pointer, button);
-        if(newGame){
-            newGame = false;
-            tempOver = 0f;
-            mainShip.flushDestroy();
-            mainShip.setHp(5);
+        if (state == State.PLAYING) {
+            mainShip.touchUp(touch, pointer, button);
+        }
+        else if (state == State.GAME_OVER) {
+            newGameButton.touchUp(touch, pointer, button);
         }
         return false;
     }
@@ -157,17 +170,19 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.update(delta);
         }
-        if(mainShip.isDestroyed()){
-            tempOver += delta;
-        }
-        bulletPool.updateActiveSprites(delta);
-        enemyShipPool.updateActiveSprites(delta);
         explosionPool.updateActiveSprites(delta);
-        mainShip.update(delta);
-        enemyEmitter.generate(delta);
+        if (state == State.PLAYING) {
+            bulletPool.updateActiveSprites(delta);
+            enemyShipPool.updateActiveSprites(delta);
+            mainShip.update(delta);
+            enemyEmitter.generate(delta);
+        }
     }
 
     private void checkCollision() {
+        if (state == State.GAME_OVER) {
+            return;
+        }
         List<EnemyShip> enemyShipList = enemyShipPool.getActiveObjects();
         for (EnemyShip enemyShip : enemyShipList) {
             if (enemyShip.isDestroyed()) {
@@ -177,6 +192,9 @@ public class GameScreen extends BaseScreen {
             if (enemyShip.pos.dst(mainShip.pos) < minDist) {
                 enemyShip.destroy();
                 mainShip.damage(enemyShip.getDamage());
+                if (mainShip.isDestroyed()) {
+                    state = State.GAME_OVER;
+                }
                 return;
             }
         }
@@ -188,6 +206,9 @@ public class GameScreen extends BaseScreen {
             if (bullet.getOwner() != mainShip) {
                 if (mainShip.isBulletCollision(bullet)) {
                     mainShip.damage(bullet.getDamage());
+                    if (mainShip.isDestroyed()) {
+                        state = State.GAME_OVER;
+                    }
                     bullet.destroy();
                     return;
                 }
@@ -216,23 +237,17 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
-        if(tempOver < 0.74f){
-            bulletPool.drawActiveSprites(batch);
-            enemyShipPool.drawActiveSprites(batch);
+        explosionPool.drawActiveSprites(batch);
+        if (state == State.PLAYING) {
             mainShip.draw(batch);
-            explosionPool.drawActiveSprites(batch);
-        }
-        else {
-            bulletPool.dispose();
-            enemyShipPool.dispose();
-            explosionPool.dispose();
-            enemyBulletSound.dispose();
-            explosionSound.dispose();
-            mainShip.dispose();
+            enemyShipPool.drawActiveSprites(batch);
+            bulletPool.drawActiveSprites(batch);
+        }else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
             newGameButton.draw(batch);
         }
 //        batch.draw(logoRegion, 0, 0, 0.2f, 0.2f);
         batch.end();
-        }
+    }
+
 }

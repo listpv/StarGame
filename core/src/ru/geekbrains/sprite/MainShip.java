@@ -20,7 +20,7 @@ public class MainShip extends Ship {
     public static final float SHIP_HEIGHT = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final float RELOAD_INTERVAL = 0.2f;
-    private static final int HP = 5;
+    private static final int HP = 10;
 
     private static final int INVALID_POINTER = -1;
 
@@ -67,6 +67,17 @@ public class MainShip extends Ship {
 //        this.sound = sound;
 //        shootPosition = false;
 //    }
+
+    public void startNewGame(Rect worldBounds) {
+        this.hp = HP;
+        this.pos.x = worldBounds.pos.x;
+        pressedLeft = false;
+        pressedRight = false;
+        leftPointer = INVALID_POINTER;
+        rightPointer = INVALID_POINTER;
+        stop();
+        flushDestroy();
+    }
 
     @Override
     public void resize(Rect worldBounds) {
