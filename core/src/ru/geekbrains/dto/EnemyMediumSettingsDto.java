@@ -29,4 +29,17 @@ public class EnemyMediumSettingsDto extends EnemySettingsDto {
         setHeight(ENEMY_MEDIUM_HEIGHT);
         setHp(ENEMY_MEDIUM_HP);
     }
+
+    @Override
+    public void setDamageForLevel(int level) {
+        setDamage(ENEMY_MEDIUM_DAMAGE * level);
+    }
+
+    @Override
+    public void setHpForLevel(int level) {
+        if(level > 1){
+            setHp(ENEMY_MEDIUM_HP * level / 2);
+        }
+//        setHp(ENEMY_MEDIUM_HP * level);
+    }
 }

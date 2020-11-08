@@ -78,10 +78,6 @@ public abstract class Ship extends Sprite{
         hp -= damage;
         if (hp <= 0) {
             hp = 0;
-//            if (this instanceof MainShip)
-//            {
-//
-//            }
             destroy();
         }
     }
@@ -90,22 +86,22 @@ public abstract class Ship extends Sprite{
         return damage;
     }
 
+    public int getHp() {
+        return hp;
+    }
+
+    public Vector2 getV() {
+        return v;
+    }
+
     private void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, bulletPos, bulletV, worldBounds, damage, bulletHeight);
         bulletSound.play();
     }
 
-    public BulletPool getBulletPool() {
-        return bulletPool;
-    }
-
     private void boom() {
         Explosion explosion = explosionPool.obtain();
         explosion.set(getHeight(), pos);
-    }
-
-    public void setHp(int hp) {
-        this.hp = hp;
     }
 }

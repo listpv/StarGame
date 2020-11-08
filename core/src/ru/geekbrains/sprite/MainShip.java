@@ -20,7 +20,7 @@ public class MainShip extends Ship {
     public static final float SHIP_HEIGHT = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final float RELOAD_INTERVAL = 0.2f;
-    private static final int HP = 10;
+    private static final int HP = 100;
 
     private static final int INVALID_POINTER = -1;
 
@@ -221,6 +221,10 @@ public class MainShip extends Ship {
 
     private void stop() {
         v.setZero();
+    }
+
+    public void setHP(){
+        this.hp = HP;
     }
 
 //    private void shoot() {

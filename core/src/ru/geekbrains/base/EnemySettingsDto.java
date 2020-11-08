@@ -73,6 +73,10 @@ public abstract class EnemySettingsDto {
         this.damage = damage;
     }
 
+    public abstract void setDamageForLevel(int level);
+
+    public abstract void setHpForLevel(int level);   // увелечение жизней с возрастанием level.
+
     public float getReloadInterval() {
         return reloadInterval;
     }
